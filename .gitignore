@@ -1,0 +1,15 @@
+/target/
+/classes/
+/checkouts/
+
+/profiles.clj
+/pom.xml
+/pom.xml.asc
+/.lein-*
+/.nrepl-port
+/.projectile
+
+*.jar
+*.class
+#*
+.#*
