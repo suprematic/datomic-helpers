@@ -2,6 +2,25 @@
 
 Helpers for declaring Datomic schema.
 
+## Rationale
+
+Datomic schema is a list of facts defined as Clojure data, which is great. But
+Datomic doesn't tell how to organize DB schema. The simplest option would be
+defining a single list of database objects.
+That is fine for small schemas. But when schema grows, it becomes hard to manage
+and validate it:
+
+- while developing, you may want to turn on/off some attribute definitions
+- text editors don't like huge Clojure forms
+
+Also, it's better to ensure that
+
+- all the schema entities have unique names
+- DB functions are syntactically correct and don't refer undefined symbols
+
+datomic-helpers is an attempt to solve the problems above adding some
+convenience to defining Datomic database schemas.
+
 ## Usage
 
 Add dependency
@@ -46,7 +65,7 @@ Define attributes
    :db/valueType :db.type/ref
    :db/cardinality :db.cardinality/one
    :db/doc "The cap color"})
-   
+
 (defschema pencil
   {:db/ident :pencil/core-color
    :db/valueType :db.type/ref
