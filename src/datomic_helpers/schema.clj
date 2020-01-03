@@ -60,7 +60,30 @@
 ;; ====================================================================
 
 
-(defmacro defidents [group-name & idents]
+(defmacro defidents
+  "Defines a private var `group-name` binding it to a list of identity
+  definitions. `idents` are keywords which will be used as :db/ident values.
+
+  The code below
+
+  ```
+  (defidents color
+    :color/red
+    :color/yellow)
+  ```
+
+  is similar to
+
+  ```
+  (def ^:private color
+    [{:db/ident :color/red
+      :db/doc \"color\"}
+     {:db/ident :color/yellow
+      :db/doc \"color\"}])
+  ```
+
+  Throws on invalid arguments."
+  [group-name & idents]
   (let [group-name (vary-meta group-name assoc ::db-schema true)
         group-str (name group-name)]
     `(def ^:private ~group-name (->idents ~group-str [~@idents]))))
