@@ -8,6 +8,49 @@
 ;; ====================================================================
 
 
+(defn check-attribute-definition [attr]
+  (assert
+    (keyword? (:db/ident attr))
+    (format
+      ":db/ident must be a keyword, got %s, attribute definition: %s"
+      (:db/ident attr) attr))
+  (assert
+    (if (contains? attr :db/doc)
+      (-> attr :db/doc string?)
+      true)
+    (format
+      ":db/doc must be a string, got %s, attribute definition: %s"
+      (:db/doc attr) attr))
+  (assert
+    (if (contains? attr :db/valueType)
+      (-> attr :db/valueType keyword?)
+      true)
+    (format
+      ":db/valueType must be a keyword, got %s, attribute definition: %s"
+      (:db/valueType attr) attr))
+  (assert
+    (if (contains? attr :db/cardinality)
+      (-> attr :db/cardinality keyword?)
+      true)
+    (format
+      ":db/cardinality must be a keyword, got %s, attribute definition: %s"
+      (:db/cardinality attr) attr))
+  (assert
+    (if (contains? attr :db/unique)
+      (-> attr :db/unique keyword?)
+      true)
+    (format
+      ":db/unique must be a keyword, got %s, attribute definition: %s"
+      (:db/unique attr) attr))
+  (assert
+    (if (contains? attr :db/isComponent)
+      (-> attr :db/isComponent boolean?)
+      true)
+    (format
+      ":db/isComponent must be a keyword, got %s, attribute definition: %s"
+      (:db/isComponent attr) attr)))
+
+
 (defn db-fn* [fname args code docs]
   (merge
     {:db/ident (keyword fname)
@@ -125,7 +168,10 @@
 (defmacro defschema [schema-name & attr-defs]
   (let [schema-meta {::db-schema true}
         schema-name (vary-meta schema-name merge schema-meta)]
-    `(def ^:private ~schema-name [~@attr-defs])))
+    `(do
+       (doseq [attr# [~@attr-defs]]
+         (check-attribute-definition attr#))
+       (def ^:private ~schema-name [~@attr-defs]))))
 
 
 (defmacro collect-schema []
