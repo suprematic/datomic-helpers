@@ -52,6 +52,12 @@
 
 
 (defn ->idents [group-name ident-keys]
+  (assert
+    (every? keyword? ident-keys)
+    (format
+      "identity name must be a keyword, got %s (group: %s)"
+      (first (filter (complement keyword?) ident-keys))
+      group-name))
   (mapv #(hash-map :db/doc group-name :db/ident %) ident-keys))
 
 
