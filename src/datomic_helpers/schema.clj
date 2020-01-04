@@ -55,6 +55,14 @@
   (mapv #(hash-map :db/doc group-name :db/ident %) ident-keys))
 
 
+(defmacro collect-db-fns []
+  `(collect-db-fns* *ns*))
+
+
+(defmacro collect-schemas []
+  `(collect-schemas* *ns*))
+
+
 ;; ====================================================================
 ;; API
 ;; ====================================================================
@@ -112,14 +120,6 @@
   (let [schema-meta {::db-schema true}
         schema-name (vary-meta schema-name merge schema-meta)]
     `(def ^:private ~schema-name [~@attr-defs])))
-
-
-(defmacro collect-db-fns []
-  `(collect-db-fns* *ns*))
-
-
-(defmacro collect-schemas []
-  `(collect-schemas* *ns*))
 
 
 (defmacro collect-schema []
