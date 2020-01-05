@@ -1,6 +1,7 @@
 /target/
 /classes/
 /checkouts/
+/.clj-kondo/
 
 /profiles.clj
 /pom.xml
