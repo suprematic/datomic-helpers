@@ -176,7 +176,22 @@
          #'~fname assoc ::db-fn (db-fn* ~fname-str '~args '~fcode '~docs)))))
 
 
-(defmacro defschema [schema-name & attr-defs]
+(defmacro defschema
+  "Defines a private var `schema-name` binding it to a list of attribute
+  definitions attr-defs.
+
+  Each definition must have at least `:db/ident` attriubte. Types of the
+  following attributes are checked:
+
+  - `:db/ident`
+  - `:db/docs`
+  - `:db/valueType`
+  - `:db/cardinality`
+  - `:db/unique`
+  - `:db/isComponent`
+
+  Throws on invalid arguments."
+  [schema-name & attr-defs]
   (let [schema-meta {::db-schema true}
         schema-name (vary-meta schema-name merge schema-meta)]
     `(do
