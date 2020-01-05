@@ -146,7 +146,18 @@
     `(def ^:private ~group-name (->idents ~group-str [~@idents]))))
 
 
-(defmacro db-fn [fname docs-or-args & more]
+(defmacro db-fn
+  "Creates a private function which can be collected by `collect-schema`
+  as a DB function definition.
+
+  The definition has
+  `:db/ident` set to a keyword with name fname,
+  `:db/docs` set to the function's docstring if provided.
+
+  The arguments are the same as of `defn`.
+
+  Throws on invalid arguments."
+  [fname docs-or-args & more]
   (let [[docs args body]
         (cond
           (string? docs-or-args)
