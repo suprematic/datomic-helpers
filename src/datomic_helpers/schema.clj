@@ -200,7 +200,13 @@
        (def ^:private ~schema-name [~@attr-defs]))))
 
 
-(defmacro collect-schema []
+(defmacro collect-schema
+  "Returns a list of all entity definitions (identities, attributes,
+  DB functions) in the current namespace. Checks if all the `:db/ident`
+  values are unique.
+
+  Throws on errors."
+  []
   `(let [schema# (concat (collect-schemas) (collect-db-fns))]
      (check-duplicate-attrs schema#)
      schema#))
