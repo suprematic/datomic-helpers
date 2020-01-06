@@ -17,6 +17,53 @@
 
 
 ;; ====================================================================
+;; defidents
+;; ====================================================================
+
+
+(deftest defidents--no-definitions
+  (let [idents-sym (gensym "idents--")]
+    (eval (list `dschema/defidents idents-sym))
+    (is (empty? @(resolve idents-sym)))))
+
+
+(deftest defidents--ok
+  (let [idents-sym (gensym "idents--")]
+    (reset-db)
+    (eval (list `dschema/defidents idents-sym
+            ::dschema/test1
+            ::dschema/test2))
+    (let [db-conn (datomic/connect db-url)]
+      (is @(datomic/transact db-conn @(resolve idents-sym)))
+      (let [db (datomic/db db-conn)
+            entities
+            (datomic/pull-many db '[*] [::dschema/test1 ::dschema/test2])]
+        (is
+          (= [::dschema/test1 ::dschema/test2]
+            (mapv :db/ident entities)))
+        (is (every? #{(name idents-sym)} (mapv :db/doc entities)))))))
+
+
+(deftest defidents--invalid-args
+  (is
+    (thrown? clojure.lang.Compiler$CompilerException
+      (eval (list `dschema/defidents "abc"))))
+  (is
+    (thrown? clojure.lang.Compiler$CompilerException
+      (eval (list `dschema/defidents 1))))
+  (let [idents-sym (gensym "idents--")]
+    (is
+      (thrown? clojure.lang.Compiler$CompilerException
+        (eval (list `dschema/defidents idents-sym {}))))
+    (is
+      (thrown? clojure.lang.Compiler$CompilerException
+        (eval (list `dschema/defidents idents-sym "abc"))))
+    (is
+      (thrown? clojure.lang.Compiler$CompilerException
+        (eval (list `dschema/defidents idents-sym 1 2))))))
+
+
+;; ====================================================================
 ;; db-fn
 ;; ====================================================================
 
