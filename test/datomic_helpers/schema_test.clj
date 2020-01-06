@@ -64,6 +64,77 @@
 
 
 ;; ====================================================================
+;; defschema
+;; ====================================================================
+
+
+(deftest defschema--no-definitions
+  (let [schema-sym (gensym "schema--")]
+    (eval (list `dschema/defschema schema-sym))
+    (is (empty? @(resolve schema-sym)))))
+
+
+(deftest defschema--ok
+  (let [schema-sym (gensym "schema--")]
+    (eval (list `dschema/defschema schema-sym
+            {:db/ident ::dschema/test1}
+            {:db/ident ::dschema/test2}))
+    (let [db-conn (datomic/connect db-url)]
+      (is @(datomic/transact db-conn @(resolve schema-sym)))
+      (let [db (datomic/db db-conn)
+            entities
+            (datomic/pull-many db '[*] [::dschema/test1 ::dschema/test2])]
+        (is
+          (= [::dschema/test1 ::dschema/test2]
+            (mapv :db/ident entities)))))))
+
+
+(deftest defschema--invalid-args
+  (let [schema-sym (gensym "schema--")]
+    (eval (list `dschema/defschema schema-sym
+            {:db/ident ::dschema/test1}
+            {:db/ident ::dschema/test2}))
+    (let [db-conn (datomic/connect db-url)]
+      (is @(datomic/transact db-conn @(resolve schema-sym)))
+      (let [db (datomic/db db-conn)
+            entities
+            (datomic/pull-many db '[*] [::dschema/test1 ::dschema/test2])]
+        (is
+          (= [::dschema/test1 ::dschema/test2]
+            (mapv :db/ident entities)))))))
+
+
+(deftest defschema--invalid-attribute
+  (let [schema-sym (gensym "schema--")]
+    (eval (list `dschema/defschema schema-sym
+            {:db/ident ::dschema/test1}
+            {:db/ident ::dschema/test2}))
+    (let [db-conn (datomic/connect db-url)]
+      (is @(datomic/transact db-conn @(resolve schema-sym)))
+      (let [db (datomic/db db-conn)
+            entities
+            (datomic/pull-many db '[*] [::dschema/test1 ::dschema/test2])]
+        (is
+          (= [::dschema/test1 ::dschema/test2]
+            (mapv :db/ident entities)))))))
+
+
+(deftest defschema--duplicate-identities
+  (let [schema-sym (gensym "schema--")]
+    (eval (list `dschema/defschema schema-sym
+            {:db/ident ::dschema/test1}
+            {:db/ident ::dschema/test2}))
+    (let [db-conn (datomic/connect db-url)]
+      (is @(datomic/transact db-conn @(resolve schema-sym)))
+      (let [db (datomic/db db-conn)
+            entities
+            (datomic/pull-many db '[*] [::dschema/test1 ::dschema/test2])]
+        (is
+          (= [::dschema/test1 ::dschema/test2]
+            (mapv :db/ident entities)))))))
+
+
+;; ====================================================================
 ;; db-fn
 ;; ====================================================================
 
@@ -122,3 +193,21 @@
       (let [db (datomic/db db-conn)
             entity (datomic/pull db '[*] ::dschema/test)]
         (is (= ::dschema/test (:db/ident entity)))))))
+
+
+
+;; ====================================================================
+;; collect-schema
+;; ====================================================================
+
+
+(deftest collect-schema--no-definitions
+  )
+
+
+(deftest collect-schema--ok
+  )
+
+
+(deftest collect-schema--duplicate-identities
+  )
